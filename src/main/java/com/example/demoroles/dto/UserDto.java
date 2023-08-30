@@ -1,6 +1,5 @@
 package com.example.demoroles.dto;
 
-
 import com.example.demoroles.entities.User;
 
 public class UserDto {

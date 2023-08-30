@@ -53,9 +53,7 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    public JwtAuthenticationFilter authenticationTokenFilterBean() {
-        return new JwtAuthenticationFilter();
-    }
+    public JwtAuthenticationFilter authenticationTokenFilterBean() { return new JwtAuthenticationFilter(); }
 
     @Bean
     public AuthenticationManager authenticationManagerBean(AuthenticationConfiguration authConfig) throws Exception {

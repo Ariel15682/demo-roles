@@ -1,6 +1,10 @@
 package com.example.demoroles.config;
 
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
+import java.security.Key;
+//import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -9,7 +13,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import java.io.Serializable;
-import java.security.Key;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -22,11 +25,14 @@ public class TokenProvider implements Serializable {
     @Value("${jwt.token.validity}")
     public long TOKEN_VALIDITY;
 
-    @Value("${jwt.signing.key}")
-    public Key SIGNING_KEY;
-
     @Value("${jwt.authorities.key}")
     public String AUTHORITIES_KEY;
+
+    @Value("${jwt.signing.key}")
+    public String SIGNING_KEY;
+
+
+    private Key key(){ return Keys.hmacShaKeyFor( Decoders.BASE64.decode(SIGNING_KEY)); }
 
     public String getUsernameFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject);
@@ -43,7 +49,7 @@ public class TokenProvider implements Serializable {
 
     private Claims getAllClaimsFromToken(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(SIGNING_KEY)
+                .setSigningKey(key())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
@@ -64,7 +70,7 @@ public class TokenProvider implements Serializable {
                 .claim(AUTHORITIES_KEY, authorities)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + TOKEN_VALIDITY*1000))
-                .signWith(SIGNING_KEY, SignatureAlgorithm.HS256)
+                .signWith(key(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
@@ -73,9 +79,10 @@ public class TokenProvider implements Serializable {
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
-    UsernamePasswordAuthenticationToken getAuthenticationToken(final String token, final Authentication existingAuth, final UserDetails userDetails) {
+    UsernamePasswordAuthenticationToken getAuthenticationToken(final String token, final Authentication existingAuth,
+                                                               final UserDetails userDetails) {
 
-        final JwtParser jwtParser = Jwts.parserBuilder().setSigningKey(SIGNING_KEY).build();
+        final JwtParser jwtParser = Jwts.parserBuilder().setSigningKey(key()).build();
 
         final Jws<Claims> claimsJws = jwtParser.parseClaimsJws(token);
 

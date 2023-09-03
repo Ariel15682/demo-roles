@@ -33,7 +33,7 @@ public class User {
 
     @NotBlank
     @Size(min = 6, max = 120)
-    @JsonIgnore
+    @JsonIgnore //no muestra el password en la respuesta
     @Column
     private String password;
 

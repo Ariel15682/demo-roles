@@ -1,6 +1,7 @@
 package com.example.demoroles.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.ServletException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
@@ -17,7 +18,7 @@ import java.util.Map;
 public class RestAuthenticationFailureHandler implements AuthenticationFailureHandler {
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
-                                        AuthenticationException e) throws IOException {
+                                        AuthenticationException e) throws IOException, ServletException {
         response.setStatus(HttpStatus.FORBIDDEN.value());
 
         Map<String, Object> data = new HashMap<>();

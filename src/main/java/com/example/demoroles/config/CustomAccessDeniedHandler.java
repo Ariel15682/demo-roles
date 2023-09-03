@@ -1,11 +1,11 @@
 package com.example.demoroles.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.ServletException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -14,12 +14,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-@Component
+
+ @Component //@Component("accessDeniedHandler")
 public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response,
-                       AccessDeniedException e) throws IOException {
+                       AccessDeniedException e) throws IOException, ServletException {
 
         // You can create your own response here to handle method level access denied responses...
         // Follow similar method to the bad credentials handler above.

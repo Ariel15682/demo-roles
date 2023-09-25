@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 //import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -49,30 +50,23 @@ public class WebSecurityConfig {
 //        return new CustomAccessDeniedHandler();
 //    }
 
-
-//    @Autowired  //@Override (if class "extends GlobalAuthenticationConfigurerAdapter")
-//    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-//        auth.authenticationProvider(daoAuthenticationProvider());
-//    }
     @Bean
     public BCryptPasswordEncoder encoder(){ return new BCryptPasswordEncoder(); }
 
-//    @Bean
-//    public DaoAuthenticationProvider authenticationProvider() {
-//        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-//
-//        authProvider.setUserDetailsService(userDetailsService);
-//        authProvider.setPasswordEncoder(encoder());
-//
-//        return authProvider;
-//    }
+    @Autowired  //@Override (if class "extends GlobalAuthenticationConfigurerAdapter")
+    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userDetailsService).passwordEncoder(encoder());
+    }
+
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
     }
+
     @Bean
     public JwtAuthenticationFilter authenticationTokenFilterBean() { return new JwtAuthenticationFilter(); }
+
     @Bean
     //Order1
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -88,9 +82,9 @@ public class WebSecurityConfig {
                                 //.requestMatchers(HttpMethod.POST,"/api/auth/signin/**").permitAll()
                                 //.requestMatchers(AUTH_WHITE_LIST).permitAll()
                                 .requestMatchers(antMatcher(h2ConsolePath + "/**")).permitAll()
-                                //.requestMatchers("/v3/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**").permitAll() // Swagger 3
+                                //.requestMatchers("/v3/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**").permitAll()
                                 .anyRequest().authenticated());
-//              http.authenticationProvider(authenticationProvider());
+
 //              http.logout(logout -> logout
 //                                .logoutUrl("/logout")
 //                                .invalidateHttpSession(true)
